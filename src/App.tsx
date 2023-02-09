@@ -162,8 +162,8 @@ function App() {
               <div key={tIdx}>
                 <input
                   type="checkbox"
-                  id="scales"
-                  name="scales"
+                  id="doneStatus"
+                  name="doneStatus"
                   checked={t.done || false}
                   onChange={() => handleUpdateTask(i.id, tIdx)}
                   disabled={
@@ -173,7 +173,6 @@ function App() {
                         todo.id < i.id &&
                         todo.tasks.some((task) => task.done !== true)
                     ) !== -1
-                    // !todoObj[i.id - 1].tasks.every((task) => task.done === true)
                   }
                 />
                 &nbsp;

@@ -1,46 +1,94 @@
-# Getting Started with Create React App
+# Startup Todo - OAK'S LAB Audition Assignment
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The application allows you to create your own Todo phases and tasks as befitting for your startup and saves the data and progress to local storage.
 
-## Available Scripts
+## To run
 
-In the project directory, you can run:
+- Clone with `git clone https://github.com/Chizaram-Igolo/Startup-Todo.git`
+- `cd` into folder
+- Install all dependencies with `npm install`
+- Start application with `npm start` and navigate to `localhost:3000` (or available port) on your browser.
 
-### `npm start`
+## Application Screenshot
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+![Chivoora Store List](./public/01.png)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Product Specification
 
-### `npm test`
+A TODO application that:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Can have an unlimited amount of tasks.
+- Unlocks the next phase only when ALL tasks in the previous phases are accomplished.
+- Stores the progress in local storage.
+- Displays a random fact from provided URL after all phases are completed.
+- Uses TypeScript for type-checking.
 
-### `npm run build`
+## Proposal and Implementation for Reopening/Undoing a Task
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- I retrieve the state from the local memory.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+function handleUpdateTask(phaseId: number, taskId: number) {
+    const localTodoObj = getLocalTodoObj() as IPhaseObj[];
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+// Helper function for retrieving local state.
+function getLocalTodoObj() {
+    return JSON.parse(window.localStorage.getItem("todoObj") as string);
+}
+```
 
-### `npm run eject`
+- I find the specific **phase** and specific **task** and toggle the `done` property of the task base on its previous boolean value.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+// Find the phase
+const phaseIdx = localTodoObj.findIndex((todo) => todo.id === phaseId);
+const localPhase = localTodoObj[phaseIdx];
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+// Find the task
+const taskIdx = localPhase.tasks.findIndex((task) => task.id === taskId);
+const localTask = localPhase.tasks[taskIdx];
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+if (!localTask.done) {
+    localTask.done = true;
+} else {
+    localTask.done = false;
+}
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
 
-## Learn More
+- I update the application state and the local memory to reopen/undo a task.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+// Update the task and phase.
+localPhase.tasks[taskIdx] = localTask;
+localTodoObj[phaseIdx] = localPhase;
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+window.localStorage.setItem("todoObj", JSON.stringify(localTodoObj));
+
+// Update application state
+setTaskVal("");
+setTodoObj(JSON.parse(window.localStorage.getItem("todoObj") as string));
+```
+
+- I make sure to pass the phase id and task id from the component (needed to find the task that needs to be reopened/undone) to `handleUpdateTask`.
+
+```
+<input
+    type="checkbox"
+    id="doneStatus"
+    name="doneStatus"
+    checked={t.done || false}
+    onChange={() => handleUpdateTask(i.id, tIdx)}
+
+    ...
+/>
+```
+
+## Stack
+
+- React
+- TypeScript
+
+Thank you.
